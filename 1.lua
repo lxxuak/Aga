@@ -142,6 +142,7 @@ submitButton.MouseButton1Click:Connect(function()
 			statusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 			wait(2)
 			screenGui:Destroy()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/BlamzKunG/Gagg/refs/heads/main/Main.lua"))()
 			-- ใส่โค้ดที่ต้องการรันหลังจากยืนยัน key ได้ที่นี่
 			print("KEY VERIFIED!")
 		else
