@@ -1,11 +1,10 @@
 -- ================================================================
--- XEXER GAME EXPLOIT SUITE
--- Native GUI (No External Libraries - Pure Roblox API)
+-- RELWX HUB
+-- Lightweight Exploit Suite - Only Working Features
 -- ================================================================
 
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
-local WS = game:GetService("Workspace")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local LP = Players.LocalPlayer
@@ -15,12 +14,7 @@ local HRP = Char:WaitForChild("HumanoidRootPart")
 -- Remotes
 local Remotes = RS:WaitForChild("Remotes")
 local ClickRemote = Remotes:WaitForChild("Click")
-local FuerzaRemote = Remotes:WaitForChild("Fuerza")
 local RebirthRemote = Remotes:WaitForChild("Rebirth")
-local HuevoAbrirRemote = Remotes:WaitForChild("Huevo_Abrir")
-local PetsSetEquippedRemote = Remotes:WaitForChild("Pets_SetEquipped")
-local CodigoRemote = Remotes:WaitForChild("Codigo_Canjear")
-local RegaloRemote = Remotes:WaitForChild("Regalo")
 
 local ArenaRemotos = RS.Arena:WaitForChild("Remotos")
 local MobPegaRemote = ArenaRemotos:WaitForChild("MobPega")
@@ -28,15 +22,12 @@ local MobPegaRemote = ArenaRemotos:WaitForChild("MobPega")
 -- State
 local AutoClickEnabled = false
 local AutoRebirthEnabled = false
-local AutoHatchEnabled = false
 local GodModeEnabled = false
-local AutoFuerzaEnabled = false
+local SpeedEnabled = false
 
 local ClickSpeed = 0.01
 local RebirthDelay = 5
-local HatchEggName = "BasicEgg"
-local HatchCount = 1
-local FuerzaMultiplier = 999999
+local WalkSpeed = 100
 
 -- Utility
 local function fireRemote(remote, ...)
@@ -65,31 +56,9 @@ spawn(function()
 end)
 
 spawn(function()
-    while wait(0.5) do
-        if AutoFuerzaEnabled then
-            pcall(function() fireRemote(FuerzaRemote, FuerzaMultiplier) end)
-        end
-    end
-end)
-
-spawn(function()
     while wait(RebirthDelay) do
         if AutoRebirthEnabled then
             pcall(function() fireRemote(RebirthRemote) end)
-        end
-    end
-end)
-
-spawn(function()
-    while wait(1) do
-        if AutoHatchEnabled then
-            for i = 1, HatchCount do
-                pcall(function()
-                    local result = fireRemote(HuevoAbrirRemote, HatchEggName)
-                    if result then print("[Hatch]", HatchEggName, "→", result) end
-                end)
-                wait(0.1)
-            end
         end
     end
 end)
@@ -103,40 +72,25 @@ OldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     return OldNamecall(self, ...)
 end))
 
-local function TeleportTo(cframe)
-    if Char and HRP then HRP.CFrame = cframe end
-end
-
-local function RedeemCode(code)
-    local success, result = pcall(function() return fireRemote(CodigoRemote, code) end)
-    if success and result then
-        Notify("✓ Code", code)
-        return true
+-- Speed Loop
+spawn(function()
+    while wait(0.1) do
+        if SpeedEnabled and Char and Char:FindFirstChild("Humanoid") then
+            Char.Humanoid.WalkSpeed = WalkSpeed
+        end
     end
-    return false
-end
-
-local function RedeemAllCodes()
-    local codes = {"RELEASE","LAUNCH","BETA","1000LIKES","5000LIKES","10KLIKES","UPDATE1","UPDATE2","FREEPET","SECRET","VIP","CHRISTMAS","HALLOWEEN","EASTER","SUMMER","WINTER"}
-    Notify("Codes", "Starting...")
-    local count = 0
-    for _, code in pairs(codes) do
-        if RedeemCode(code) then count = count + 1 end
-        wait(1)
-    end
-    Notify("Codes", count .. " redeemed")
-end
+end)
 
 -- GUI
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "XexerGUI"
+ScreenGui.Name = "RELWX_HUB"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = LP.PlayerGui
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "Main"
-MainFrame.Size = UDim2.new(0, 520, 0, 420)
-MainFrame.Position = UDim2.new(0.5, -260, 0.5, -210)
+MainFrame.Size = UDim2.new(0, 400, 0, 320)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -160)
 MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
@@ -152,7 +106,7 @@ Title.Name = "Title"
 Title.Size = UDim2.new(1, 0, 0, 40)
 Title.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 Title.BorderSizePixel = 0
-Title.Text = "XEXER Exploit Suite"
+Title.Text = "RELWX HUB"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 18
 Title.Font = Enum.Font.GothamBold
@@ -162,9 +116,48 @@ local TitleCorner = Instance.new("UICorner")
 TitleCorner.CornerRadius = UDim.new(0, 8)
 TitleCorner.Parent = Title
 
+-- Close Button
+local CloseButton = Instance.new("TextButton")
+CloseButton.Name = "Close"
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -35, 0, 5)
+CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CloseButton.BorderSizePixel = 0
+CloseButton.Text = "×"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 20
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = Title
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 4)
+CloseCorner.Parent = CloseButton
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+    Notify("RELWX HUB", "Closed")
+end)
+
+-- Minimize Button
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Name = "Minimize"
+MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
+MinimizeButton.Position = UDim2.new(1, -70, 0, 5)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+MinimizeButton.BorderSizePixel = 0
+MinimizeButton.Text = "−"
+MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.TextSize = 20
+MinimizeButton.Font = Enum.Font.GothamBold
+MinimizeButton.Parent = Title
+
+local MinimizeCorner = Instance.new("UICorner")
+MinimizeCorner.CornerRadius = UDim.new(0, 4)
+MinimizeCorner.Parent = MinimizeButton
+
 local TabBar = Instance.new("Frame")
 TabBar.Name = "TabBar"
-TabBar.Size = UDim2.new(0, 120, 1, -40)
+TabBar.Size = UDim2.new(0, 100, 1, -40)
 TabBar.Position = UDim2.new(0, 0, 0, 40)
 TabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 TabBar.BorderSizePixel = 0
@@ -177,8 +170,8 @@ TabLayout.Parent = TabBar
 
 local ContentFrame = Instance.new("Frame")
 ContentFrame.Name = "Content"
-ContentFrame.Size = UDim2.new(1, -120, 1, -40)
-ContentFrame.Position = UDim2.new(0, 120, 0, 40)
+ContentFrame.Size = UDim2.new(1, -100, 1, -40)
+ContentFrame.Position = UDim2.new(0, 100, 0, 40)
 ContentFrame.BackgroundTransparency = 1
 ContentFrame.Parent = MainFrame
 
@@ -194,6 +187,31 @@ local Layout = Instance.new("UIListLayout")
 Layout.Padding = UDim.new(0, 8)
 Layout.SortOrder = Enum.SortOrder.LayoutOrder
 Layout.Parent = ScrollFrame
+
+-- Wire up Minimize Button
+local isMinimized = false
+local fullSize = UDim2.new(0, 400, 0, 320)
+local minSize = UDim2.new(0, 400, 0, 45)
+
+MinimizeButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    local targetSize = isMinimized and minSize or fullSize
+    local targetText = isMinimized and "+" or "−"
+
+    TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Size = targetSize
+    }):Play()
+
+    MinimizeButton.Text = targetText
+    TabBar.Visible = not isMinimized
+    ContentFrame.Visible = not isMinimized
+
+    if isMinimized then
+        Notify("RELWX HUB", "Minimized")
+    else
+        Notify("RELWX HUB", "Restored")
+    end
+end)
 
 -- Helper Functions
 local currentTab = nil
@@ -351,7 +369,7 @@ end
 
 -- Build Tabs
 local FarmTab = CreateTab("Farm")
-AddLabel(FarmTab, "Click Farming")
+AddLabel(FarmTab, "Auto Click")
 AddToggle(FarmTab, "Auto Click", function(state)
     AutoClickEnabled = state
     Notify("Auto Click", state and "Enabled" or "Disabled")
@@ -364,20 +382,7 @@ AddTextbox(FarmTab, "Click Speed (0.01)", function(val)
     end
 end)
 
-AddLabel(FarmTab, "Force Multiplier")
-AddToggle(FarmTab, "Auto Fuerza", function(state)
-    AutoFuerzaEnabled = state
-    Notify("Auto Fuerza", state and "Enabled" or "Disabled")
-end)
-AddTextbox(FarmTab, "Fuerza Value (999999)", function(val)
-    local num = tonumber(val)
-    if num then
-        FuerzaMultiplier = num
-        Notify("Fuerza", val)
-    end
-end)
-
-AddLabel(FarmTab, "Rebirth")
+AddLabel(FarmTab, "Auto Rebirth")
 AddToggle(FarmTab, "Auto Rebirth", function(state)
     AutoRebirthEnabled = state
     Notify("Auto Rebirth", state and "Enabled" or "Disabled")
@@ -394,147 +399,33 @@ AddButton(FarmTab, "Rebirth Once", function()
     Notify("Rebirth", "Triggered")
 end)
 
--- TAB 2: PETS
-local PetTab = CreateTab("Pets")
-AddLabel(PetTab, "Auto Hatch")
-AddToggle(PetTab, "Auto Hatch Eggs", function(state)
-    AutoHatchEnabled = state
-    Notify("Auto Hatch", state and "Enabled" or "Disabled")
+local MiscTab = CreateTab("Misc")
+AddLabel(MiscTab, "Movement")
+AddToggle(MiscTab, "Speed Hack", function(state)
+    SpeedEnabled = state
+    if not state and Char and Char:FindFirstChild("Humanoid") then
+        Char.Humanoid.WalkSpeed = 16
+    end
+    Notify("Speed Hack", state and "Enabled" or "Disabled")
 end)
-AddTextbox(PetTab, "Egg Name (BasicEgg)", function(val)
-    HatchEggName = val
-    Notify("Egg", val)
-end)
-AddTextbox(PetTab, "Hatch Count (1)", function(val)
+AddTextbox(MiscTab, "Walk Speed (100)", function(val)
     local num = tonumber(val)
     if num and num > 0 then
-        HatchCount = num
-        Notify("Hatch Count", val)
+        WalkSpeed = num
+        Notify("Speed", val)
     end
 end)
-AddButton(PetTab, "Hatch Once", function()
-    local result = fireRemote(HuevoAbrirRemote, HatchEggName)
-    Notify("Hatch", result and tostring(result) or "Failed")
-end)
-AddLabel(PetTab, "Pet Management")
-AddButton(PetTab, "Equip All Pets", function()
-    for i = 1, 50 do
-        pcall(function() fireRemote(PetsSetEquippedRemote, i, true) end)
-    end
-    Notify("Pets", "Equipped all")
-end)
 
--- TAB 3: TELEPORTS
-local TPTab = CreateTab("Teleport")
-AddLabel(TPTab, "Weapon Pads (13 Total)")
-
-local weaponPads = {
-    {"Pad01 - Rookie Blade", "Pad01"},
-    {"Pad02 - Ashen Fang", "Pad02"},
-    {"Pad03 - Searing Edge", "Pad03"},
-    {"Pad04 - Bloodletter", "Pad04"},
-    {"Pad05 - Frostbite", "Pad05"},
-    {"Pad06 - Royal Standard", "Pad06"},
-    {"Pad07 - Infernal Eye", "Pad07"},
-    {"Pad08 - Void Arc", "Pad08"},
-    {"Pad09 - Soul Eater", "Pad09"},
-    {"Pad10 - Divine Judgment", "Pad10"},
-    {"Pad11 - Thunderstrike", "Pad11"},
-    {"Pad12 - Amethyst Shard", "Pad12"},
-    {"Pad13 - Shadow Sovereign", "Pad13"}
-}
-
-for _, pad in pairs(weaponPads) do
-    AddButton(TPTab, pad[1], function()
-        pcall(function()
-            local target = WS.PADS.Pads:FindFirstChild(pad[2])
-            if target and target:FindFirstChild("Led") then
-                TeleportTo(target.Led.CFrame * CFrame.new(0, 3, 0))
-                wait(0.5)
-                if target.Led:FindFirstChild("Equipar") and target.Led.Equipar:FindFirstChild("Prompt") then
-                    fireproximityprompt(target.Led.Equipar.Prompt)
-                end
-                Notify("TP", pad[1])
-            else
-                Notify("Error", "Pad not found")
-            end
-        end)
-    end)
-end
-
-AddLabel(TPTab, "Special Locations")
-
-AddButton(TPTab, "Pet Exclusive Shop", function()
-    pcall(function()
-        local t = WS.Lobby.Interactivos.PetExclusivo.Nucleo
-        if t then
-            TeleportTo(t.CFrame * CFrame.new(0, 5, 0))
-            Notify("TP", "Pet Shop")
-        end
-    end)
-end)
-
-AddButton(TPTab, "Fusion Machine", function()
-    pcall(function()
-        local t = WS.Lobby.Interactivos.FusionMaquina.Nucleo
-        if t then
-            TeleportTo(t.CFrame * CFrame.new(0, 5, 0))
-            Notify("TP", "Fusion Machine")
-        end
-    end)
-end)
-
-AddButton(TPTab, "Boss Shop", function()
-    pcall(function()
-        local t = WS.Lobby.Interactivos.TiendaJefe.Cofre.Nucleo
-        if t then
-            TeleportTo(t.CFrame * CFrame.new(0, 5, 0))
-            Notify("TP", "Boss Shop")
-        end
-    end)
-end)
-
--- TAB 4: MISC
-local MiscTab = CreateTab("Misc")
 AddLabel(MiscTab, "Combat")
 AddToggle(MiscTab, "God Mode", function(state)
     GodModeEnabled = state
     Notify("God Mode", state and "Enabled" or "Disabled")
 end)
 
-AddLabel(MiscTab, "Gifts & Items")
-AddButton(MiscTab, "Claim All Gifts", function()
-    for i = 1, 20 do
-        pcall(function() fireRemote(RegaloRemote, i) end)
-    end
-    Notify("Gifts", "Claimed all")
-end)
-
-AddLabel(MiscTab, "Player Controls")
-AddButton(MiscTab, "Reset Character", function()
-    LP.Character:BreakJoints()
-    Notify("Reset", "Character reset")
-end)
-
-AddButton(MiscTab, "Rejoin Server", function()
-    game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, LP)
-end)
-
--- TAB 5: CODES
-local CodeTab = CreateTab("Codes")
-AddLabel(CodeTab, "Redeem Codes")
-AddTextbox(CodeTab, "Enter Code", function(val)
-    RedeemCode(val)
-end)
-AddButton(CodeTab, "Redeem All Codes", RedeemAllCodes)
-AddLabel(CodeTab, "Common: RELEASE, BETA")
-AddLabel(CodeTab, "UPDATE1, FREEPET, SECRET")
-
 -- Initialize First Tab
 wait(0.1)
 for _, btn in pairs(TabBar:GetChildren()) do
     if btn:IsA("TextButton") then
-        btn.MouseButton1Click:Connect(function() end)
         btn.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
         break
     end
@@ -542,4 +433,4 @@ end
 
 if FarmTab then FarmTab.Visible = true end
 
-Notify("XEXER Suite", "Loaded successfully")
+Notify("RELWX HUB", "Loaded successfully")
